@@ -2,7 +2,7 @@
  * saas-utils/rate-limiter
  * Rate limiting utilities with request deduplication
  *
- * ⚠️ B-142 SERVERLESS WARNING:
+ * ⚠️ SERVERLESS WARNING:
  * This rate limiter uses in-memory storage (Map). On serverless platforms (Vercel, Lambda),
  * each function instance has its own memory, so rate limits may not be enforced across
  * instances. For production use cases requiring strict rate limiting:

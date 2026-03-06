@@ -8,7 +8,7 @@
  * import { analyzePricing, formatAnalysis } from 'saas-utils/pricing'
  *
  * const analysis = analyzePricing({
- *   project: 'keyflash',
+ *   project: 'example-project',
  *   tiers: [
  *     { name: 'Free', price: 0 },
  *     { name: 'Pro', price: 29, targetMargin: 0.90 }

@@ -22,7 +22,7 @@ describe('ProductRateLimiter', () => {
     it('should have correct validation limits', () => {
       expect(PRODUCT_LIMITS.validation.runsPerPurchase).toBe(3)
       expect(PRODUCT_LIMITS.validation.deepResearchPerMonth).toBe(5)
-      // B-119: Updated pricing - $49 @ 20% margin for competitive positioning
+      // Updated pricing - $49 @ 20% margin for competitive positioning
       expect(PRODUCT_LIMITS.validation.price).toBe(49)
       expect(PRODUCT_LIMITS.validation.maxCostPercent).toBe(20)
     })
@@ -60,7 +60,7 @@ describe('ProductRateLimiter', () => {
       expect(purchase.runsUsed).toBe(0)
       expect(purchase.maxRuns).toBe(PRODUCT_LIMITS.validation.runsPerPurchase)
       expect(purchase.costUsed).toBe(0)
-      // B-119: $49 @ 20% = $9.80 max cost (competitive with ValidatorAI)
+      // $49 @ 20% = $9.80 max cost (competitive with ValidatorAI)
       expect(purchase.maxCost).toBeCloseTo(9.8, 2) // 20% of $49
       expect(purchase.price).toBe(49)
     })
@@ -328,7 +328,7 @@ describe('ProductRateLimiter', () => {
   })
 
   describe('cost-based limiting (80% margin protection)', () => {
-    // B-119: Validation pricing updated to $49 @ 20% = $9.80 max cost
+    // Validation pricing updated to $49 @ 20% = $9.80 max cost
     it('should reject if estimated cost exceeds remaining budget', async () => {
       limiter.registerPurchase('user-1', 'validation', 'purchase-1')
       // Max cost is $9.80 (20% of $49)

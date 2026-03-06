@@ -18,7 +18,7 @@ import { AdvancedRateLimiter, createRateLimiter } from '../rate-limiter'
 
 // Product limits (mirrored from @saas/agents/config/models)
 // Keeping separate to avoid circular dependency
-// B-119: Pricing update - competitive positioning
+// Pricing update - competitive positioning
 // Validator: $297 → $49 (market: $0-49, ValidatorAI $49)
 // Starter Kit: $199/$349 (competitive with ShipFast $199, Supastarter $349)
 export const PRODUCT_LIMITS = {
