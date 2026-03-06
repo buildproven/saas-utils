@@ -1,6 +1,6 @@
 /**
  * saas-utils
- * Shared utilities, types, and constants for Vibe Build Lab
+ * Shared utilities, types, and constants for SaaS projects
  */
 
 // Stripe utilities
