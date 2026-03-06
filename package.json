@@ -1,0 +1,51 @@
+{
+  "name": "saas-utils",
+  "version": "0.1.0",
+  "description": "Production-grade SaaS utility modules: rate limiting, encryption, caching, Stripe, auth, and more",
+  "license": "MIT",
+  "keywords": ["saas", "utilities", "rate-limiter", "encryption", "stripe", "cache", "nextjs"],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./logger": {
+      "types": "./dist/logger/index.d.ts",
+      "default": "./dist/logger/index.js"
+    },
+    "./rate-limiter": {
+      "types": "./dist/rate-limiter/index.d.ts",
+      "default": "./dist/rate-limiter/index.js"
+    },
+    "./stripe/testing": {
+      "types": "./dist/stripe/testing.d.ts",
+      "default": "./dist/stripe/testing.js"
+    },
+    "./type-guards": {
+      "types": "./dist/type-guards/index.d.ts",
+      "default": "./dist/type-guards/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.34.0",
+    "zod": "^3.23.0"
+  },
+  "peerDependencies": {
+    "next": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.0.0",
+    "next": "^15.0.0",
+    "stripe": "^17.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}
