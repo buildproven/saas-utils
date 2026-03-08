@@ -1,21 +1,79 @@
-MIT License
+COMMERCIAL SOFTWARE LICENSE AGREEMENT
 
-Copyright (c) 2026
+Copyright (c) 2026. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+IMPORTANT: READ THIS LICENSE AGREEMENT CAREFULLY BEFORE INSTALLING OR USING
+THIS SOFTWARE. BY INSTALLING, COPYING, OR OTHERWISE USING THIS SOFTWARE, YOU
+AGREE TO BE BOUND BY THE TERMS OF THIS AGREEMENT.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. GRANT OF LICENSE
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+   Subject to the terms of this Agreement, you are granted a non-exclusive,
+   non-transferable license to install and use this software ("Software") for
+   your internal business purposes.
+
+2. RESTRICTIONS
+
+   You may NOT:
+   a) Redistribute, sublicense, sell, rent, lease, or transfer the Software
+      or any copies thereof to any third party.
+   b) Reverse engineer, decompile, disassemble, or attempt to derive the
+      source code of the Software, except to the extent permitted by
+      applicable law.
+   c) Remove or alter any proprietary notices, labels, or marks on the
+      Software.
+   d) Use the Software to create a competing product or service.
+   e) Make the Software available as a service to third parties (SaaS,
+      hosting, managed service) without a separate written agreement.
+
+3. INTELLECTUAL PROPERTY
+
+   The Software is protected by copyright law and international treaties.
+   All title, ownership rights, and intellectual property rights in and to
+   the Software remain with the licensor. This Agreement does not grant you
+   any rights to patents, copyrights, trade secrets, trademarks, or any
+   other rights with respect to the Software.
+
+4. SUPPORT AND UPDATES
+
+   This license does not entitle you to any support, updates, or new
+   versions of the Software unless separately agreed in writing.
+
+5. DISCLAIMER OF WARRANTIES
+
+   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+   NON-INFRINGEMENT. THE LICENSOR DOES NOT WARRANT THAT THE SOFTWARE WILL
+   MEET YOUR REQUIREMENTS OR THAT OPERATION OF THE SOFTWARE WILL BE
+   UNINTERRUPTED OR ERROR-FREE.
+
+6. LIMITATION OF LIABILITY
+
+   IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+   TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+7. TERMINATION
+
+   This Agreement is effective until terminated. It will terminate
+   automatically without notice if you fail to comply with any provision of
+   this Agreement. Upon termination, you must destroy all copies of the
+   Software in your possession.
+
+8. GOVERNING LAW
+
+   This Agreement shall be governed by and construed in accordance with
+   applicable law, without regard to conflict of law provisions.
+
+9. ENTIRE AGREEMENT
+
+   This Agreement constitutes the entire agreement between you and the
+   licensor with respect to the Software and supersedes all prior or
+   contemporaneous understandings, communications, and agreements.
+
+For licensing inquiries, contact: support@saas-utils.dev

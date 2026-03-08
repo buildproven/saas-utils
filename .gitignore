@@ -1,4 +1,38 @@
 node_modules/
 dist/
 *.tsbuildinfo
+
+# Environment files — never commit secrets
 .env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+
+# Credentials and secrets
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Scrub log
+.scrub.log
+
+# Cache and temp
+.cache/
+*.log
+coverage/
+.nyc_output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
