@@ -144,4 +144,5 @@ Every module has co-located tests (`*.test.ts`).
 
 ## License
 
-MIT
+Commercial license. See [LICENSE](./LICENSE) for full terms. Not for redistribution.
+Contact support@saas-utils.dev for licensing inquiries.
