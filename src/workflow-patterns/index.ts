@@ -10,22 +10,22 @@
 /**
  * Branch type for development work
  */
-export type BranchType = 'feature' | 'fix' | 'refactor' | 'experiment'
+export type BranchType = 'feature' | 'fix' | 'refactor' | 'experiment';
 
 /**
  * Git sync options
  */
 export interface GitSyncOptions {
   /** Skip commit step */
-  skipCommit?: boolean
+  skipCommit?: boolean;
   /** Skip docs update (CHANGELOG, BACKLOG) */
-  skipDocs?: boolean
+  skipDocs?: boolean;
   /** Skip Vercel deployment */
-  skipDeploy?: boolean
+  skipDeploy?: boolean;
   /** Skip auto-versioning and tagging */
-  skipRelease?: boolean
+  skipRelease?: boolean;
   /** Custom commit message */
-  commitMessage?: string
+  commitMessage?: string;
 }
 
 /**
@@ -33,19 +33,19 @@ export interface GitSyncOptions {
  */
 export interface GitSyncResult {
   /** Whether sync was successful */
-  success: boolean
+  success: boolean;
   /** Commits pushed */
-  commitsPushed: number
+  commitsPushed: number;
   /** Whether docs were updated */
-  docsUpdated: boolean
+  docsUpdated: boolean;
   /** Whether deployed */
-  deployed: boolean
+  deployed: boolean;
   /** Deployment URL */
-  deploymentUrl?: string
+  deploymentUrl?: string;
   /** Release version */
-  releaseVersion?: string
+  releaseVersion?: string;
   /** Error message if failed */
-  error?: string
+  error?: string;
 }
 
 /**
@@ -53,11 +53,11 @@ export interface GitSyncResult {
  */
 export interface DevWorkflowOptions {
   /** Branch name */
-  name: string
+  name: string;
   /** Branch type (auto-detected if not provided) */
-  type?: BranchType
+  type?: BranchType;
   /** Force specific branch type */
-  force?: boolean
+  force?: boolean;
 }
 
 /**
@@ -65,13 +65,13 @@ export interface DevWorkflowOptions {
  */
 export interface DevWorkflowResult {
   /** Created branch name */
-  branchName: string
+  branchName: string;
   /** Branch type */
-  branchType: BranchType
+  branchType: BranchType;
   /** Whether branch was created successfully */
-  success: boolean
+  success: boolean;
   /** Error message if failed */
-  error?: string
+  error?: string;
 }
 
 /** Branch type prefix mappings */
@@ -80,7 +80,7 @@ const BRANCH_TYPE_PREFIXES: Record<BranchType, string[]> = {
   refactor: ['refactor-'],
   experiment: ['experiment-', 'exp-', 'test-'],
   feature: [],
-}
+};
 
 /**
  * Detect branch type from name
@@ -92,15 +92,15 @@ const BRANCH_TYPE_PREFIXES: Record<BranchType, string[]> = {
  * - everything else -> feature
  */
 export function detectBranchType(name: string): BranchType {
-  const lowerName = name.toLowerCase()
+  const lowerName = name.toLowerCase();
 
   for (const [type, prefixes] of Object.entries(BRANCH_TYPE_PREFIXES)) {
-    if (prefixes.some(prefix => lowerName.startsWith(prefix))) {
-      return type as BranchType
+    if (prefixes.some((prefix) => lowerName.startsWith(prefix))) {
+      return type as BranchType;
     }
   }
 
-  return 'feature'
+  return 'feature';
 }
 
 /**
@@ -112,32 +112,32 @@ export function detectBranchType(name: string): BranchType {
  * - experiment-ai -> ai
  */
 export function removeBranchTypePrefix(name: string): string {
-  const lowerName = name.toLowerCase()
-  const allPrefixes = Object.values(BRANCH_TYPE_PREFIXES).flat()
+  const lowerName = name.toLowerCase();
+  const allPrefixes = Object.values(BRANCH_TYPE_PREFIXES).flat();
 
   for (const prefix of allPrefixes) {
     if (lowerName.startsWith(prefix)) {
-      return name.slice(prefix.length)
+      return name.slice(prefix.length);
     }
   }
 
-  return name
+  return name;
 }
 
 /**
  * Generate branch name from type and name
  */
 export function generateBranchName(type: BranchType, name: string): string {
-  const cleanName = removeBranchTypePrefix(name)
-  return `${type}/${cleanName}`
+  const cleanName = removeBranchTypePrefix(name);
+  return `${type}/${cleanName}`;
 }
 
 /**
  * Get context-aware questions based on branch type
  */
 export function getRequirementsQuestions(type: BranchType): {
-  title: string
-  questions: string[]
+  title: string;
+  questions: string[];
 } {
   switch (type) {
     case 'feature':
@@ -148,7 +148,7 @@ export function getRequirementsQuestions(type: BranchType): {
           'Technical requirements',
           'Any constraints or dependencies',
         ],
-      }
+      };
     case 'fix':
       return {
         title: 'What bug are we fixing?',
@@ -158,21 +158,17 @@ export function getRequirementsQuestions(type: BranchType): {
           'Steps to reproduce',
           'Any error messages',
         ],
-      }
+      };
     case 'refactor':
       return {
         title: 'What should we refactor?',
-        questions: [
-          'Current code issues',
-          'Target improvements',
-          'Must preserve behavior?',
-        ],
-      }
+        questions: ['Current code issues', 'Target improvements', 'Must preserve behavior?'],
+      };
     case 'experiment':
       return {
         title: 'What are we testing?',
         questions: ['Hypothesis', 'What to measure', 'Success criteria'],
-      }
+      };
   }
 }
 
@@ -198,18 +194,18 @@ export const GIT_SYNC_STEPS = {
   DEPLOY: 'deploy',
   /** Auto-version and tag */
   RELEASE: 'release',
-} as const
+} as const;
 
 /**
  * Git divergence state
  */
 export interface GitDivergenceState {
   /** Number of commits ahead of remote */
-  ahead: number
+  ahead: number;
   /** Number of commits behind remote */
-  behind: number
+  behind: number;
   /** Whether diverged from remote */
-  diverged: boolean
+  diverged: boolean;
 }
 
 /**
@@ -217,13 +213,13 @@ export interface GitDivergenceState {
  */
 export function calculateGitDivergence(
   localAhead: number,
-  remoteBehind: number
+  remoteBehind: number,
 ): GitDivergenceState {
   return {
     ahead: localAhead,
     behind: remoteBehind,
     diverged: localAhead > 0 && remoteBehind > 0,
-  }
+  };
 }
 
 /**
@@ -241,26 +237,26 @@ export const GIT_SYNC_WORKFLOW_ORDER = [
   GIT_SYNC_STEPS.UPDATE_BACKLOG,
   GIT_SYNC_STEPS.DEPLOY,
   GIT_SYNC_STEPS.RELEASE,
-] as const
+] as const;
 
 /**
  * Deployment configuration
  */
 export interface DeploymentConfig {
   /** Platform (vercel, netlify, etc.) */
-  platform: 'vercel' | 'netlify' | 'cloudflare' | 'custom'
+  platform: 'vercel' | 'netlify' | 'cloudflare' | 'custom';
   /** Whether auto-deploy is enabled */
-  autoDeployEnabled: boolean
+  autoDeployEnabled: boolean;
   /** Production branch */
-  productionBranch: string
+  productionBranch: string;
   /** Deployment command */
-  deployCommand?: string
+  deployCommand?: string;
 }
 
 /**
  * Release version bump type
  */
-export type VersionBump = 'major' | 'minor' | 'patch'
+export type VersionBump = 'major' | 'minor' | 'patch';
 
 /**
  * Determine version bump from commits
@@ -272,58 +268,55 @@ export type VersionBump = 'major' | 'minor' | 'patch'
  */
 export function determineVersionBump(commits: string[]): VersionBump | null {
   if (commits.length === 0) {
-    return null
+    return null;
   }
 
   const hasBreakingChange = commits.some(
-    commit => commit.includes('BREAKING CHANGE') || commit.includes('!')
-  )
+    (commit) => commit.includes('BREAKING CHANGE') || commit.includes('!'),
+  );
   if (hasBreakingChange) {
-    return 'major'
+    return 'major';
   }
 
   const hasFeature = commits.some(
-    commit => commit.startsWith('feat:') || commit.startsWith('feat(')
-  )
+    (commit) => commit.startsWith('feat:') || commit.startsWith('feat('),
+  );
   if (hasFeature) {
-    return 'minor'
+    return 'minor';
   }
 
-  return 'patch'
+  return 'patch';
 }
 
 /**
  * Apply version bump to semantic version
  */
-export function applyVersionBump(
-  currentVersion: string,
-  bump: VersionBump
-): string {
-  const match = currentVersion.match(/^v?(\d+)\.(\d+)\.(\d+)/)
+export function applyVersionBump(currentVersion: string, bump: VersionBump): string {
+  const match = currentVersion.match(/^v?(\d+)\.(\d+)\.(\d+)/);
   if (!match) {
-    throw new Error(`Invalid semantic version: ${currentVersion}`)
+    throw new Error(`Invalid semantic version: ${currentVersion}`);
   }
 
-  let major = Number(match[1])
-  let minor = Number(match[2])
-  let patch = Number(match[3])
+  let major = Number(match[1]);
+  let minor = Number(match[2]);
+  let patch = Number(match[3]);
 
   switch (bump) {
     case 'major':
-      major += 1
-      minor = 0
-      patch = 0
-      break
+      major += 1;
+      minor = 0;
+      patch = 0;
+      break;
     case 'minor':
-      minor += 1
-      patch = 0
-      break
+      minor += 1;
+      patch = 0;
+      break;
     case 'patch':
-      patch += 1
-      break
+      patch += 1;
+      break;
   }
 
-  return `v${major}.${minor}.${patch}`
+  return `v${major}.${minor}.${patch}`;
 }
 
 /**
@@ -331,13 +324,13 @@ export function applyVersionBump(
  */
 export interface ChangelogEntry {
   /** Commit hash */
-  hash: string
+  hash: string;
   /** Commit message */
-  message: string
+  message: string;
   /** Entry type (Added, Changed, Fixed, Removed) */
-  type: 'Added' | 'Changed' | 'Fixed' | 'Removed'
+  type: 'Added' | 'Changed' | 'Fixed' | 'Removed';
   /** Commit date */
-  date: Date
+  date: Date;
 }
 
 /**
@@ -346,16 +339,16 @@ export interface ChangelogEntry {
 export function parseCommitToChangelogEntry(
   hash: string,
   message: string,
-  date: Date
+  date: Date,
 ): ChangelogEntry {
-  let type: ChangelogEntry['type'] = 'Changed'
+  let type: ChangelogEntry['type'] = 'Changed';
 
   if (message.startsWith('feat:') || message.startsWith('feat(')) {
-    type = 'Added'
+    type = 'Added';
   } else if (message.startsWith('fix:') || message.startsWith('fix(')) {
-    type = 'Fixed'
+    type = 'Fixed';
   } else if (message.startsWith('remove:') || message.startsWith('remove(')) {
-    type = 'Removed'
+    type = 'Removed';
   }
 
   return {
@@ -363,25 +356,25 @@ export function parseCommitToChangelogEntry(
     message,
     type,
     date,
-  }
+  };
 }
 
 /**
  * Group changelog entries by type
  */
 export function groupChangelogEntries(
-  entries: ChangelogEntry[]
+  entries: ChangelogEntry[],
 ): Record<ChangelogEntry['type'], ChangelogEntry[]> {
   return entries.reduce(
     (acc, entry) => {
-      acc[entry.type].push(entry)
-      return acc
+      acc[entry.type].push(entry);
+      return acc;
     },
     {
       Added: [],
       Changed: [],
       Fixed: [],
       Removed: [],
-    } as Record<ChangelogEntry['type'], ChangelogEntry[]>
-  )
+    } as Record<ChangelogEntry['type'], ChangelogEntry[]>,
+  );
 }

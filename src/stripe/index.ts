@@ -37,7 +37,7 @@ export {
   type WebhookEndpoint,
   type CreateWebhookOptions,
   type WebhookResult,
-} from './webhooks'
+} from './webhooks';
 
 // Checkout utilities
 export {
@@ -50,7 +50,7 @@ export {
   type CheckoutSession,
   type CreateCheckoutOptions,
   type TestCheckoutData,
-} from './checkout'
+} from './checkout';
 
 // Environment management
 export {
@@ -64,7 +64,7 @@ export {
   type EnvUpdateResult,
   type FullSetupOptions,
   type FullSetupResult,
-} from './env'
+} from './env';
 
 // Playwright E2E testing helpers
 export {
@@ -76,21 +76,21 @@ export {
   waitForWebhookDelivery,
   TEST_CARDS as PLAYWRIGHT_TEST_CARDS,
   type CheckoutFormData,
-} from './playwright'
+} from './playwright';
 
 // Unit test mocks and factories - IMPORT DIRECTLY from 'saas-utils/stripe/testing' in test files
 // Not exported from main entry to avoid vitest dependency in production builds
 // export * from './testing'
 
 // Namespace exports for organized access
-import * as webhooks from './webhooks'
-import * as checkout from './checkout'
-import * as env from './env'
-import * as playwright from './playwright'
+import * as webhooks from './webhooks';
+import * as checkout from './checkout';
+import * as env from './env';
+import * as playwright from './playwright';
 
-export const stripeWebhooks = webhooks
-export const stripeCheckout = checkout
-export const stripeEnv = env
-export const stripePlaywright = playwright
+export const stripeWebhooks = webhooks;
+export const stripeCheckout = checkout;
+export const stripeEnv = env;
+export const stripePlaywright = playwright;
 
 // Test utilities available via direct import: import { ... } from 'saas-utils/stripe/testing'
