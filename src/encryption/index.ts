@@ -15,63 +15,61 @@
  *   const decrypted = await decryptToken(encrypted)
  */
 
-import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto'
-import { promisify } from 'util'
+import { createCipheriv, createDecipheriv, randomBytes, scrypt } from 'crypto';
+import { promisify } from 'util';
 
-const scryptAsync = promisify(scrypt)
+const scryptAsync = promisify(scrypt);
 
-const ALGORITHM = 'aes-256-gcm'
-const IV_LENGTH = 16
-const SALT_LENGTH = 32
-const TAG_LENGTH = 16
-const KEY_LENGTH = 32
+const ALGORITHM = 'aes-256-gcm';
+const IV_LENGTH = 16;
+const SALT_LENGTH = 32;
+const TAG_LENGTH = 16;
+const KEY_LENGTH = 32;
 
 export interface EncryptionConfig {
-  encryptionKey?: string
+  encryptionKey?: string;
 }
 
-let globalEncryptionKey: string | null = null
+let globalEncryptionKey: string | null = null;
 
 /**
  * Set the encryption key programmatically (alternative to env var)
  */
 export function setEncryptionKey(key: string): void {
   if (key.length !== 64) {
-    throw new Error(
-      'Encryption key must be exactly 32 bytes (64 hex characters)'
-    )
+    throw new Error('Encryption key must be exactly 32 bytes (64 hex characters)');
   }
-  globalEncryptionKey = key
+  globalEncryptionKey = key;
 }
 
 /**
  * Clear the programmatically set encryption key
  */
 export function clearEncryptionKey(): void {
-  globalEncryptionKey = null
+  globalEncryptionKey = null;
 }
 
 function getEncryptionKey(): string {
-  const encryptionKey = globalEncryptionKey || process.env.ENCRYPTION_KEY
+  const encryptionKey = globalEncryptionKey || process.env.ENCRYPTION_KEY;
 
   if (!encryptionKey) {
     throw new Error(
-      'ENCRYPTION_KEY environment variable is required for token encryption. Generate with: openssl rand -hex 32'
-    )
+      'ENCRYPTION_KEY environment variable is required for token encryption. Generate with: openssl rand -hex 32',
+    );
   }
 
   if (encryptionKey.length !== 64) {
     throw new Error(
-      'ENCRYPTION_KEY must be exactly 32 bytes (64 hex characters). Generate with: openssl rand -hex 32'
-    )
+      'ENCRYPTION_KEY must be exactly 32 bytes (64 hex characters). Generate with: openssl rand -hex 32',
+    );
   }
 
-  return encryptionKey
+  return encryptionKey;
 }
 
 async function deriveKey(masterKey: string, salt: Buffer): Promise<Buffer> {
-  const keyBuffer = Buffer.from(masterKey, 'hex')
-  return (await scryptAsync(keyBuffer, salt, KEY_LENGTH)) as Buffer
+  const keyBuffer = Buffer.from(masterKey, 'hex');
+  return (await scryptAsync(keyBuffer, salt, KEY_LENGTH)) as Buffer;
 }
 
 /**
@@ -81,38 +79,33 @@ async function deriveKey(masterKey: string, salt: Buffer): Promise<Buffer> {
  */
 export async function encryptToken(token: string): Promise<string> {
   if (!token) {
-    return token
+    return token;
   }
 
   try {
-    const masterKey = getEncryptionKey()
+    const masterKey = getEncryptionKey();
 
-    const salt = randomBytes(SALT_LENGTH)
-    const iv = randomBytes(IV_LENGTH)
+    const salt = randomBytes(SALT_LENGTH);
+    const iv = randomBytes(IV_LENGTH);
 
-    const key = await deriveKey(masterKey, salt)
+    const key = await deriveKey(masterKey, salt);
 
-    const cipher = createCipheriv(ALGORITHM, key, iv)
+    const cipher = createCipheriv(ALGORITHM, key, iv);
 
-    let encrypted = cipher.update(token, 'utf8', 'hex')
-    encrypted += cipher.final('hex')
+    let encrypted = cipher.update(token, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
 
-    const tag = cipher.getAuthTag()
+    const tag = cipher.getAuthTag();
 
-    const combined = Buffer.concat([
-      salt,
-      iv,
-      tag,
-      Buffer.from(encrypted, 'hex'),
-    ])
+    const combined = Buffer.concat([salt, iv, tag, Buffer.from(encrypted, 'hex')]);
 
-    return combined.toString('base64')
+    return combined.toString('base64');
   } catch (error) {
     if (error instanceof Error && error.message.includes('ENCRYPTION_KEY')) {
-      throw error
+      throw error;
     }
-    console.error('Token encryption failed:', error)
-    throw new Error('Failed to encrypt token')
+    console.error('Token encryption failed:', error);
+    throw new Error('Failed to encrypt token', { cause: error });
   }
 }
 
@@ -123,39 +116,36 @@ export async function encryptToken(token: string): Promise<string> {
  */
 export async function decryptToken(encryptedToken: string): Promise<string> {
   if (!encryptedToken) {
-    return encryptedToken
+    return encryptedToken;
   }
 
   try {
-    const masterKey = getEncryptionKey()
+    const masterKey = getEncryptionKey();
 
-    const combined = Buffer.from(encryptedToken, 'base64')
+    const combined = Buffer.from(encryptedToken, 'base64');
 
-    const salt = combined.subarray(0, SALT_LENGTH)
-    const iv = combined.subarray(SALT_LENGTH, SALT_LENGTH + IV_LENGTH)
-    const tag = combined.subarray(
-      SALT_LENGTH + IV_LENGTH,
-      SALT_LENGTH + IV_LENGTH + TAG_LENGTH
-    )
-    const encrypted = combined.subarray(SALT_LENGTH + IV_LENGTH + TAG_LENGTH)
+    const salt = combined.subarray(0, SALT_LENGTH);
+    const iv = combined.subarray(SALT_LENGTH, SALT_LENGTH + IV_LENGTH);
+    const tag = combined.subarray(SALT_LENGTH + IV_LENGTH, SALT_LENGTH + IV_LENGTH + TAG_LENGTH);
+    const encrypted = combined.subarray(SALT_LENGTH + IV_LENGTH + TAG_LENGTH);
 
-    const key = await deriveKey(masterKey, salt)
+    const key = await deriveKey(masterKey, salt);
 
-    const decipher = createDecipheriv(ALGORITHM, key, iv)
-    decipher.setAuthTag(tag)
+    const decipher = createDecipheriv(ALGORITHM, key, iv);
+    decipher.setAuthTag(tag);
 
-    let decrypted = decipher.update(encrypted, undefined, 'utf8')
-    decrypted += decipher.final('utf8')
+    let decrypted = decipher.update(encrypted, undefined, 'utf8');
+    decrypted += decipher.final('utf8');
 
-    return decrypted
+    return decrypted;
   } catch (error) {
     if (error instanceof Error && error.message.includes('ENCRYPTION_KEY')) {
-      throw error
+      throw error;
     }
-    console.error('Token decryption failed:', error)
-    throw new Error(
-      'Failed to decrypt token - token may be corrupted or key changed'
-    )
+    console.error('Token decryption failed:', error);
+    throw new Error('Failed to decrypt token - token may be corrupted or key changed', {
+      cause: error,
+    });
   }
 }
 
@@ -165,13 +155,13 @@ export async function decryptToken(encryptedToken: string): Promise<string> {
  * @returns True if the value appears to be an encrypted token
  */
 export function isEncryptedToken(value: string): boolean {
-  if (!value) return false
+  if (!value) return false;
 
   try {
-    const buffer = Buffer.from(value, 'base64')
-    return buffer.length >= SALT_LENGTH + IV_LENGTH + TAG_LENGTH + 1
+    const buffer = Buffer.from(value, 'base64');
+    return buffer.length >= SALT_LENGTH + IV_LENGTH + TAG_LENGTH + 1;
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -180,7 +170,7 @@ export function isEncryptedToken(value: string): boolean {
  * @returns A 32-byte (64 hex character) encryption key
  */
 export function generateEncryptionKey(): string {
-  return randomBytes(32).toString('hex')
+  return randomBytes(32).toString('hex');
 }
 
 /**
@@ -193,25 +183,25 @@ export function generateEncryptionKey(): string {
 export async function rotateTokenEncryption(
   encryptedToken: string,
   oldKey: string,
-  newKey: string
+  newKey: string,
 ): Promise<string> {
   if (!encryptedToken) {
-    return encryptedToken
+    return encryptedToken;
   }
 
-  const originalKey = globalEncryptionKey
-  setEncryptionKey(oldKey)
+  const originalKey = globalEncryptionKey;
+  setEncryptionKey(oldKey);
 
   try {
-    const decrypted = await decryptToken(encryptedToken)
-    setEncryptionKey(newKey)
-    const reencrypted = await encryptToken(decrypted)
-    return reencrypted
+    const decrypted = await decryptToken(encryptedToken);
+    setEncryptionKey(newKey);
+    const reencrypted = await encryptToken(decrypted);
+    return reencrypted;
   } finally {
     if (originalKey) {
-      setEncryptionKey(originalKey)
+      setEncryptionKey(originalKey);
     } else {
-      clearEncryptionKey()
+      clearEncryptionKey();
     }
   }
 }
@@ -221,9 +211,9 @@ export async function rotateTokenEncryption(
  * Useful for idempotent encryption operations
  */
 export async function ensureEncrypted(value: string): Promise<string> {
-  if (!value) return value
-  if (isEncryptedToken(value)) return value
-  return encryptToken(value)
+  if (!value) return value;
+  if (isEncryptedToken(value)) return value;
+  return encryptToken(value);
 }
 
 /**
@@ -231,7 +221,7 @@ export async function ensureEncrypted(value: string): Promise<string> {
  * Useful for safe decryption operations
  */
 export async function ensureDecrypted(value: string): Promise<string> {
-  if (!value) return value
-  if (!isEncryptedToken(value)) return value
-  return decryptToken(value)
+  if (!value) return value;
+  if (!isEncryptedToken(value)) return value;
+  return decryptToken(value);
 }
