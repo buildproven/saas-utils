@@ -4,23 +4,23 @@
  */
 
 export interface WebhookEndpoint {
-  id: string
-  url: string
-  status: string
-  secret?: string
-  enabled_events: string[]
-  description?: string
+  id: string;
+  url: string;
+  status: string;
+  secret?: string;
+  enabled_events: string[];
+  description?: string;
 }
 
 export interface CreateWebhookOptions {
-  url: string
-  events: string[]
-  description?: string
+  url: string;
+  events: string[];
+  description?: string;
 }
 
 export interface WebhookResult {
-  endpoint: WebhookEndpoint
-  secret: string
+  endpoint: WebhookEndpoint;
+  secret: string;
 }
 
 /**
@@ -30,44 +30,42 @@ async function stripeRequest<T>(
   method: string,
   path: string,
   secretKey: string,
-  data?: Record<string, string | string[]>
+  data?: Record<string, string | string[]>,
 ): Promise<T> {
-  const url = `https://api.stripe.com/v1/${path}`
+  const url = `https://api.stripe.com/v1/${path}`;
   const headers: Record<string, string> = {
     Authorization: `Basic ${Buffer.from(secretKey + ':').toString('base64')}`,
     'Content-Type': 'application/x-www-form-urlencoded',
-  }
+  };
 
-  const options: RequestInit = { method, headers }
+  const options: RequestInit = { method, headers };
 
   if (data && (method === 'POST' || method === 'PUT')) {
-    const params = new URLSearchParams()
+    const params = new URLSearchParams();
     for (const [key, value] of Object.entries(data)) {
       if (Array.isArray(value)) {
-        value.forEach(v => params.append(`${key}[]`, v))
+        value.forEach((v) => params.append(`${key}[]`, v));
       } else {
-        params.append(key, value)
+        params.append(key, value);
       }
     }
-    options.body = params.toString()
+    options.body = params.toString();
   }
 
-  const response = await fetch(url, options)
-  return response.json() as Promise<T>
+  const response = await fetch(url, options);
+  return response.json() as Promise<T>;
 }
 
 /**
  * List all webhook endpoints
  */
-export async function listWebhooks(
-  secretKey: string
-): Promise<WebhookEndpoint[]> {
+export async function listWebhooks(secretKey: string): Promise<WebhookEndpoint[]> {
   const result = await stripeRequest<{ data: WebhookEndpoint[] }>(
     'GET',
     'webhook_endpoints',
-    secretKey
-  )
-  return result.data || []
+    secretKey,
+  );
+  return result.data || [];
 }
 
 /**
@@ -75,10 +73,10 @@ export async function listWebhooks(
  */
 export async function findWebhooks(
   secretKey: string,
-  urlPattern: string
+  urlPattern: string,
 ): Promise<WebhookEndpoint[]> {
-  const webhooks = await listWebhooks(secretKey)
-  return webhooks.filter(w => w.url.includes(urlPattern))
+  const webhooks = await listWebhooks(secretKey);
+  return webhooks.filter((w) => w.url.includes(urlPattern));
 }
 
 /**
@@ -86,9 +84,9 @@ export async function findWebhooks(
  */
 export async function deleteWebhook(
   secretKey: string,
-  endpointId: string
+  endpointId: string,
 ): Promise<{ deleted: boolean; id: string }> {
-  return stripeRequest('DELETE', `webhook_endpoints/${endpointId}`, secretKey)
+  return stripeRequest('DELETE', `webhook_endpoints/${endpointId}`, secretKey);
 }
 
 /**
@@ -96,28 +94,28 @@ export async function deleteWebhook(
  */
 export async function createWebhook(
   secretKey: string,
-  options: CreateWebhookOptions
+  options: CreateWebhookOptions,
 ): Promise<WebhookResult> {
   const data: Record<string, string | string[]> = {
     url: options.url,
     enabled_events: options.events,
-  }
+  };
 
   if (options.description) {
-    data.description = options.description
+    data.description = options.description;
   }
 
   const endpoint = await stripeRequest<WebhookEndpoint & { secret: string }>(
     'POST',
     'webhook_endpoints',
     secretKey,
-    data
-  )
+    data,
+  );
 
   return {
     endpoint,
     secret: endpoint.secret,
-  }
+  };
 }
 
 /**
@@ -126,20 +124,20 @@ export async function createWebhook(
  */
 export async function recreateWebhook(
   secretKey: string,
-  options: CreateWebhookOptions
+  options: CreateWebhookOptions,
 ): Promise<WebhookResult> {
   // Extract domain from URL for matching
-  const urlObj = new URL(options.url)
-  const domain = urlObj.hostname
+  const urlObj = new URL(options.url);
+  const domain = urlObj.hostname;
 
   // Find and delete existing webhooks for this domain
-  const existing = await findWebhooks(secretKey, domain)
+  const existing = await findWebhooks(secretKey, domain);
   for (const endpoint of existing) {
-    await deleteWebhook(secretKey, endpoint.id)
+    await deleteWebhook(secretKey, endpoint.id);
   }
 
   // Create new webhook
-  return createWebhook(secretKey, options)
+  return createWebhook(secretKey, options);
 }
 
 /**
@@ -148,33 +146,29 @@ export async function recreateWebhook(
 export async function getRecentEvents(
   secretKey: string,
   eventType?: string,
-  limit = 5
+  limit = 5,
 ): Promise<
   Array<{
-    id: string
-    type: string
-    pending_webhooks: number
-    created: number
-    data: { object: Record<string, unknown> }
+    id: string;
+    type: string;
+    pending_webhooks: number;
+    created: number;
+    data: { object: Record<string, unknown> };
   }>
 > {
-  let path = `events?limit=${limit}`
+  let path = `events?limit=${limit}`;
   if (eventType) {
-    path += `&type=${eventType}`
+    path += `&type=${eventType}`;
   }
 
-  const result = await stripeRequest<{ data: Array<unknown> }>(
-    'GET',
-    path,
-    secretKey
-  )
+  const result = await stripeRequest<{ data: Array<unknown> }>('GET', path, secretKey);
   return result.data as Array<{
-    id: string
-    type: string
-    pending_webhooks: number
-    created: number
-    data: { object: Record<string, unknown> }
-  }>
+    id: string;
+    type: string;
+    pending_webhooks: number;
+    created: number;
+    data: { object: Record<string, unknown> };
+  }>;
 }
 
 /**
@@ -182,26 +176,26 @@ export async function getRecentEvents(
  */
 export async function checkWebhookHealth(
   secretKey: string,
-  urlPattern: string
+  urlPattern: string,
 ): Promise<{
-  healthy: boolean
-  endpoint?: WebhookEndpoint
-  pendingEvents: number
-  message: string
+  healthy: boolean;
+  endpoint?: WebhookEndpoint;
+  pendingEvents: number;
+  message: string;
 }> {
-  const webhooks = await findWebhooks(secretKey, urlPattern)
+  const webhooks = await findWebhooks(secretKey, urlPattern);
 
   if (webhooks.length === 0) {
     return {
       healthy: false,
       pendingEvents: 0,
       message: `No webhook endpoint found matching "${urlPattern}"`,
-    }
+    };
   }
 
-  const endpoint = webhooks[0]
-  const events = await getRecentEvents(secretKey, 'checkout.session.completed')
-  const pendingEvents = events.filter(e => e.pending_webhooks > 0).length
+  const endpoint = webhooks[0];
+  const events = await getRecentEvents(secretKey, 'checkout.session.completed');
+  const pendingEvents = events.filter((e) => e.pending_webhooks > 0).length;
 
   if (endpoint.status !== 'enabled') {
     return {
@@ -209,7 +203,7 @@ export async function checkWebhookHealth(
       endpoint,
       pendingEvents,
       message: `Webhook endpoint is ${endpoint.status}`,
-    }
+    };
   }
 
   if (pendingEvents > 0) {
@@ -218,7 +212,7 @@ export async function checkWebhookHealth(
       endpoint,
       pendingEvents,
       message: `${pendingEvents} events with pending webhooks - possible secret mismatch`,
-    }
+    };
   }
 
   return {
@@ -226,5 +220,5 @@ export async function checkWebhookHealth(
     endpoint,
     pendingEvents: 0,
     message: 'Webhooks are being delivered successfully',
-  }
+  };
 }

@@ -14,64 +14,64 @@ export interface ExitCriteria {
   /** Test requirements */
   tests: {
     /** Percentage of tests that must pass */
-    passing: number
+    passing: number;
     /** Minimum code coverage percentage */
-    coverage?: number
-  }
+    coverage?: number;
+  };
 
   /** ESLint requirements */
   eslint: {
     /** Maximum allowed errors */
-    errors: number
+    errors: number;
     /** Maximum allowed warnings */
-    warnings: number
-  }
+    warnings: number;
+  };
 
   /** TypeScript requirements */
   typescript: {
     /** Must use strict mode */
-    strict: boolean
+    strict: boolean;
     /** Maximum allowed 'any' types */
-    anyCount: number
-  }
+    anyCount: number;
+  };
 
   /** Build requirements */
   build: {
     /** Build must succeed */
-    success: boolean
-  }
+    success: boolean;
+  };
 
   /** Security requirements (optional for 95%) */
   security?: {
     /** Maximum high/critical vulnerabilities */
-    highCritical: number
+    highCritical: number;
     /** Secrets must not be exposed */
-    secretsExposed?: boolean
-  }
+    secretsExposed?: boolean;
+  };
 
   /** Accessibility requirements (optional for 95%) */
   accessibility?: {
     /** WCAG AA compliance required */
-    wcagAA: boolean
+    wcagAA: boolean;
     /** axe-core must pass all routes */
-    axeCoreClean?: boolean
-  }
+    axeCoreClean?: boolean;
+  };
 
   /** Performance requirements (optional for 95%) */
   performance?: {
     /** Minimum Lighthouse score */
-    lighthouse: number
+    lighthouse: number;
     /** N+1 queries allowed */
-    n1Queries?: number
+    n1Queries?: number;
     /** Memory leaks allowed */
-    memoryLeaks?: number
-  }
+    memoryLeaks?: number;
+  };
 
   /** Architecture requirements (optional for 95%) */
   architecture?: {
     /** Architecture review must pass */
-    reviewed: boolean
-  }
+    reviewed: boolean;
+  };
 }
 
 /**
@@ -79,15 +79,15 @@ export interface ExitCriteria {
  */
 export interface AgentConfig {
   /** Agent identifier from pr-review-toolkit or other sources */
-  id: string
+  id: string;
   /** Display name for the agent */
-  name: string
+  name: string;
   /** Description of what the agent does */
-  description: string
+  description: string;
   /** Whether this agent is required for the quality level */
-  required: boolean
+  required: boolean;
   /** Estimated time in minutes */
-  estimatedTime?: number
+  estimatedTime?: number;
 }
 
 /**
@@ -95,45 +95,43 @@ export interface AgentConfig {
  */
 export interface QualityStandard {
   /** Quality level percentage (95, 98, etc.) */
-  level: number
+  level: number;
   /** Display name */
-  name: string
+  name: string;
   /** Short description */
-  description: string
+  description: string;
   /** Exit criteria that must be met */
-  exitCriteria: ExitCriteria
+  exitCriteria: ExitCriteria;
   /** Agents to spawn for this quality level */
-  agents: readonly AgentConfig[]
+  agents: readonly AgentConfig[];
   /** Estimated total time */
-  estimatedTime: string
+  estimatedTime: string;
   /** Use cases for this quality level */
-  useCases: readonly string[]
+  useCases: readonly string[];
 }
 
 /**
  * Factory function to create ExitCriteria with validation
  */
-export function createExitCriteria(
-  criteria: ExitCriteria
-): Readonly<ExitCriteria> {
+export function createExitCriteria(criteria: ExitCriteria): Readonly<ExitCriteria> {
   // Validate required fields
   if (criteria.tests.passing < 0 || criteria.tests.passing > 100) {
-    throw new Error('tests.passing must be between 0 and 100')
+    throw new Error('tests.passing must be between 0 and 100');
   }
   if (
     criteria.tests.coverage !== undefined &&
     (criteria.tests.coverage < 0 || criteria.tests.coverage > 100)
   ) {
-    throw new Error('tests.coverage must be between 0 and 100')
+    throw new Error('tests.coverage must be between 0 and 100');
   }
   if (criteria.eslint.errors < 0) {
-    throw new Error('eslint.errors must be >= 0')
+    throw new Error('eslint.errors must be >= 0');
   }
   if (criteria.eslint.warnings < 0) {
-    throw new Error('eslint.warnings must be >= 0')
+    throw new Error('eslint.warnings must be >= 0');
   }
   if (criteria.typescript.anyCount < 0) {
-    throw new Error('typescript.anyCount must be >= 0')
+    throw new Error('typescript.anyCount must be >= 0');
   }
 
   return Object.freeze({
@@ -153,7 +151,7 @@ export function createExitCriteria(
     ...(criteria.architecture && {
       architecture: Object.freeze({ ...criteria.architecture }),
     }),
-  })
+  });
 }
 
 /**
@@ -161,52 +159,50 @@ export function createExitCriteria(
  */
 export function createAgentConfig(config: AgentConfig): Readonly<AgentConfig> {
   if (!config.id || config.id.trim().length === 0) {
-    throw new Error('id is required')
+    throw new Error('id is required');
   }
   if (!config.name || config.name.trim().length === 0) {
-    throw new Error('name is required')
+    throw new Error('name is required');
   }
   if (!config.description || config.description.trim().length === 0) {
-    throw new Error('description is required')
+    throw new Error('description is required');
   }
   if (config.estimatedTime !== undefined && config.estimatedTime < 0) {
-    throw new Error('estimatedTime must be >= 0')
+    throw new Error('estimatedTime must be >= 0');
   }
 
-  return Object.freeze({ ...config })
+  return Object.freeze({ ...config });
 }
 
 /**
  * Factory function to create QualityStandard with validation
  */
-export function createQualityStandard(
-  standard: QualityStandard
-): Readonly<QualityStandard> {
+export function createQualityStandard(standard: QualityStandard): Readonly<QualityStandard> {
   if (standard.level < 0 || standard.level > 100) {
-    throw new Error('level must be between 0 and 100')
+    throw new Error('level must be between 0 and 100');
   }
   if (!standard.name || standard.name.trim().length === 0) {
-    throw new Error('name is required')
+    throw new Error('name is required');
   }
   if (!standard.description || standard.description.trim().length === 0) {
-    throw new Error('description is required')
+    throw new Error('description is required');
   }
   if (!standard.agents || standard.agents.length === 0) {
-    throw new Error('at least one agent is required')
+    throw new Error('at least one agent is required');
   }
 
   // Validate exit criteria
-  createExitCriteria(standard.exitCriteria)
+  createExitCriteria(standard.exitCriteria);
 
   // Validate all agents
-  standard.agents.forEach(createAgentConfig)
+  standard.agents.forEach(createAgentConfig);
 
   return Object.freeze({
     ...standard,
     exitCriteria: createExitCriteria(standard.exitCriteria),
     agents: Object.freeze(standard.agents.map(createAgentConfig)),
     useCases: Object.freeze([...standard.useCases]),
-  })
+  });
 }
 
 /**
@@ -268,7 +264,7 @@ export const SHIP_READY: QualityStandard = Object.freeze({
     'Quick iterations',
     'Time-sensitive shipping',
   ]),
-})
+});
 
 /**
  * 98% Production-Perfect Standard
@@ -360,7 +356,7 @@ export const PRODUCTION_PERFECT: QualityStandard = Object.freeze({
     'Critical business features',
     'Zero-risk deployments',
   ]),
-})
+});
 
 /**
  * All quality standards
@@ -368,7 +364,7 @@ export const PRODUCTION_PERFECT: QualityStandard = Object.freeze({
 export const QUALITY_STANDARDS = {
   SHIP_READY,
   PRODUCTION_PERFECT,
-} as const
+} as const;
 
 /**
  * Get quality standard by level
@@ -376,11 +372,11 @@ export const QUALITY_STANDARDS = {
 export function getQualityStandard(level: 95 | 98): QualityStandard {
   switch (level) {
     case 95:
-      return SHIP_READY
+      return SHIP_READY;
     case 98:
-      return PRODUCTION_PERFECT
+      return PRODUCTION_PERFECT;
     default:
-      throw new Error(`Unknown quality level: ${level}`)
+      throw new Error(`Unknown quality level: ${level}`);
   }
 }
 
@@ -388,14 +384,14 @@ export function getQualityStandard(level: 95 | 98): QualityStandard {
  * Results from quality checks
  */
 export interface QualityResults {
-  tests?: { passing: number; total: number; coverage?: number }
-  eslint?: { errors: number; warnings: number }
-  typescript?: { strict: boolean; anyCount: number; errors: number }
-  build?: { success: boolean }
-  security?: { highCritical: number; secretsExposed?: boolean }
-  accessibility?: { wcagAA: boolean; axeCoreClean?: boolean }
-  performance?: { lighthouse: number; n1Queries?: number; memoryLeaks?: number }
-  architecture?: { reviewed: boolean }
+  tests?: { passing: number; total: number; coverage?: number };
+  eslint?: { errors: number; warnings: number };
+  typescript?: { strict: boolean; anyCount: number; errors: number };
+  build?: { success: boolean };
+  security?: { highCritical: number; secretsExposed?: boolean };
+  accessibility?: { wcagAA: boolean; axeCoreClean?: boolean };
+  performance?: { lighthouse: number; n1Queries?: number; memoryLeaks?: number };
+  architecture?: { reviewed: boolean };
 }
 
 /**
@@ -403,39 +399,33 @@ export interface QualityResults {
  */
 export function checkExitCriteria(
   criteria: ExitCriteria,
-  results: QualityResults
+  results: QualityResults,
 ): { passed: boolean; failures: string[] } {
-  const failures: string[] = []
+  const failures: string[] = [];
 
-  checkTests(criteria, results, failures)
-  checkEslint(criteria, results, failures)
-  checkTypescript(criteria, results, failures)
-  checkBuild(results, failures)
-  checkSecurity(criteria, results, failures)
-  checkAccessibility(criteria, results, failures)
-  checkPerformance(criteria, results, failures)
-  checkArchitecture(criteria, results, failures)
+  checkTests(criteria, results, failures);
+  checkEslint(criteria, results, failures);
+  checkTypescript(criteria, results, failures);
+  checkBuild(results, failures);
+  checkSecurity(criteria, results, failures);
+  checkAccessibility(criteria, results, failures);
+  checkPerformance(criteria, results, failures);
+  checkArchitecture(criteria, results, failures);
 
-  return { passed: failures.length === 0, failures }
+  return { passed: failures.length === 0, failures };
 }
 
-function checkTests(
-  criteria: ExitCriteria,
-  results: QualityResults,
-  failures: string[]
-): void {
-  if (!results.tests) return
+function checkTests(criteria: ExitCriteria, results: QualityResults, failures: string[]): void {
+  if (!results.tests) return;
 
   if (results.tests.total === 0) {
-    failures.push('Tests: no tests found (need 100%)')
-    return
+    failures.push('Tests: no tests found (need 100%)');
+    return;
   }
 
-  const passingPercent = (results.tests.passing / results.tests.total) * 100
+  const passingPercent = (results.tests.passing / results.tests.total) * 100;
   if (passingPercent < criteria.tests.passing) {
-    failures.push(
-      `Tests: ${passingPercent.toFixed(0)}% passing (need ${criteria.tests.passing}%)`
-    )
+    failures.push(`Tests: ${passingPercent.toFixed(0)}% passing (need ${criteria.tests.passing}%)`);
   }
 
   if (
@@ -443,113 +433,93 @@ function checkTests(
     results.tests.coverage !== undefined &&
     results.tests.coverage < criteria.tests.coverage
   ) {
-    failures.push(
-      `Coverage: ${results.tests.coverage}% (need ${criteria.tests.coverage}%)`
-    )
+    failures.push(`Coverage: ${results.tests.coverage}% (need ${criteria.tests.coverage}%)`);
   }
 }
 
-function checkEslint(
-  criteria: ExitCriteria,
-  results: QualityResults,
-  failures: string[]
-): void {
-  if (!results.eslint) return
+function checkEslint(criteria: ExitCriteria, results: QualityResults, failures: string[]): void {
+  if (!results.eslint) return;
 
   if (results.eslint.errors > criteria.eslint.errors) {
-    failures.push(`ESLint: ${results.eslint.errors} errors (need 0)`)
+    failures.push(`ESLint: ${results.eslint.errors} errors (need 0)`);
   }
   if (results.eslint.warnings > criteria.eslint.warnings) {
-    failures.push(`ESLint: ${results.eslint.warnings} warnings (need 0)`)
+    failures.push(`ESLint: ${results.eslint.warnings} warnings (need 0)`);
   }
 }
 
 function checkTypescript(
   criteria: ExitCriteria,
   results: QualityResults,
-  failures: string[]
+  failures: string[],
 ): void {
-  if (!results.typescript) return
+  if (!results.typescript) return;
 
   if (criteria.typescript.strict && !results.typescript.strict) {
-    failures.push('TypeScript: strict mode not enabled')
+    failures.push('TypeScript: strict mode not enabled');
   }
   if (results.typescript.anyCount > criteria.typescript.anyCount) {
-    failures.push(
-      `TypeScript: ${results.typescript.anyCount} 'any' types (need 0)`
-    )
+    failures.push(`TypeScript: ${results.typescript.anyCount} 'any' types (need 0)`);
   }
   if (results.typescript.errors > 0) {
-    failures.push(`TypeScript: ${results.typescript.errors} errors`)
+    failures.push(`TypeScript: ${results.typescript.errors} errors`);
   }
 }
 
 function checkBuild(results: QualityResults, failures: string[]): void {
   if (results.build && !results.build.success) {
-    failures.push('Build: failed')
+    failures.push('Build: failed');
   }
 }
 
-function checkSecurity(
-  criteria: ExitCriteria,
-  results: QualityResults,
-  failures: string[]
-): void {
-  if (!criteria.security || !results.security) return
+function checkSecurity(criteria: ExitCriteria, results: QualityResults, failures: string[]): void {
+  if (!criteria.security || !results.security) return;
 
   if (results.security.highCritical > criteria.security.highCritical) {
-    failures.push(
-      `Security: ${results.security.highCritical} high/critical vulnerabilities`
-    )
+    failures.push(`Security: ${results.security.highCritical} high/critical vulnerabilities`);
   }
-  if (
-    criteria.security.secretsExposed === false &&
-    results.security.secretsExposed
-  ) {
-    failures.push('Security: secrets exposed')
+  if (criteria.security.secretsExposed === false && results.security.secretsExposed) {
+    failures.push('Security: secrets exposed');
   }
 }
 
 function checkAccessibility(
   criteria: ExitCriteria,
   results: QualityResults,
-  failures: string[]
+  failures: string[],
 ): void {
-  if (!criteria.accessibility || !results.accessibility) return
+  if (!criteria.accessibility || !results.accessibility) return;
 
   if (!results.accessibility.wcagAA) {
-    failures.push('Accessibility: WCAG AA not met')
+    failures.push('Accessibility: WCAG AA not met');
   }
-  if (
-    criteria.accessibility.axeCoreClean &&
-    !results.accessibility.axeCoreClean
-  ) {
-    failures.push('Accessibility: axe-core violations found')
+  if (criteria.accessibility.axeCoreClean && !results.accessibility.axeCoreClean) {
+    failures.push('Accessibility: axe-core violations found');
   }
 }
 
 function checkPerformance(
   criteria: ExitCriteria,
   results: QualityResults,
-  failures: string[]
+  failures: string[],
 ): void {
-  if (!criteria.performance || !results.performance) return
+  if (!criteria.performance || !results.performance) return;
 
   if (results.performance.lighthouse < criteria.performance.lighthouse) {
     failures.push(
-      `Performance: Lighthouse ${results.performance.lighthouse} (need ${criteria.performance.lighthouse})`
-    )
+      `Performance: Lighthouse ${results.performance.lighthouse} (need ${criteria.performance.lighthouse})`,
+    );
   }
 
-  const perfCriteria = criteria.performance
-  const perfResults = results.performance
+  const perfCriteria = criteria.performance;
+  const perfResults = results.performance;
 
   if (
     perfCriteria.n1Queries !== undefined &&
     perfResults.n1Queries !== undefined &&
     perfResults.n1Queries > perfCriteria.n1Queries
   ) {
-    failures.push(`Performance: ${perfResults.n1Queries} N+1 queries found`)
+    failures.push(`Performance: ${perfResults.n1Queries} N+1 queries found`);
   }
 
   if (
@@ -557,20 +527,16 @@ function checkPerformance(
     perfResults.memoryLeaks !== undefined &&
     perfResults.memoryLeaks > perfCriteria.memoryLeaks
   ) {
-    failures.push(`Performance: ${perfResults.memoryLeaks} memory leaks found`)
+    failures.push(`Performance: ${perfResults.memoryLeaks} memory leaks found`);
   }
 }
 
 function checkArchitecture(
   criteria: ExitCriteria,
   results: QualityResults,
-  failures: string[]
+  failures: string[],
 ): void {
-  if (
-    criteria.architecture &&
-    results.architecture &&
-    !results.architecture.reviewed
-  ) {
-    failures.push('Architecture: not reviewed')
+  if (criteria.architecture && results.architecture && !results.architecture.reviewed) {
+    failures.push('Architecture: not reviewed');
   }
 }

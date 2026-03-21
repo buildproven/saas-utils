@@ -12,22 +12,22 @@
  */
 export interface AgentSpawnConfig {
   /** Agent type/subagent identifier */
-  subagent_type: string
+  subagent_type: string;
   /** Base prompt template */
-  promptTemplate: string
+  promptTemplate: string;
   /** Expected loop behavior */
   loopBehavior: {
     /** Should this agent loop until criteria met? */
-    shouldLoop: boolean
+    shouldLoop: boolean;
     /** Maximum loops before giving up (0 = unlimited) */
-    maxLoops: number
+    maxLoops: number;
     /** Description of when to stop looping */
-    exitCondition: string
-  }
+    exitCondition: string;
+  };
   /** Estimated time in minutes */
-  estimatedTime: number
+  estimatedTime: number;
   /** Agent description */
-  description: string
+  description: string;
 }
 
 /**
@@ -36,26 +36,26 @@ export interface AgentSpawnConfig {
 export function generatePrompt(
   template: string,
   context: {
-    projectPath?: string
-    changedFiles?: string[]
-    specificFocus?: string
-  }
+    projectPath?: string;
+    changedFiles?: string[];
+    specificFocus?: string;
+  },
 ): string {
-  let prompt = template
+  let prompt = template;
 
   if (context.projectPath) {
-    prompt += `\n\nProject path: ${context.projectPath}`
+    prompt += `\n\nProject path: ${context.projectPath}`;
   }
 
   if (context.changedFiles && context.changedFiles.length > 0) {
-    prompt += `\n\nFocus on these files:\n${context.changedFiles.join('\n')}`
+    prompt += `\n\nFocus on these files:\n${context.changedFiles.join('\n')}`;
   }
 
   if (context.specificFocus) {
-    prompt += `\n\n${context.specificFocus}`
+    prompt += `\n\n${context.specificFocus}`;
   }
 
-  return prompt
+  return prompt;
 }
 
 /**
@@ -139,7 +139,7 @@ export const PR_REVIEW_AGENTS = {
     estimatedTime: 10,
     description: 'Analyzes test coverage and quality',
   },
-} as const satisfies Record<string, AgentSpawnConfig>
+} as const satisfies Record<string, AgentSpawnConfig>;
 
 /**
  * Specialized Quality Agents
@@ -186,8 +186,7 @@ export const QUALITY_AGENTS = {
 
   ARCHITECT_REVIEWER: {
     subagent_type: 'architect-reviewer',
-    promptTemplate:
-      'Architecture review: patterns, scalability, technical debt, design decisions.',
+    promptTemplate: 'Architecture review: patterns, scalability, technical debt, design decisions.',
     loopBehavior: {
       shouldLoop: false,
       maxLoops: 1,
@@ -199,8 +198,7 @@ export const QUALITY_AGENTS = {
 
   REFACTORING_SPECIALIST: {
     subagent_type: 'refactoring-specialist',
-    promptTemplate:
-      'Find and fix performance issues: N+1 queries, memory leaks, O(n²) algorithms.',
+    promptTemplate: 'Find and fix performance issues: N+1 queries, memory leaks, O(n²) algorithms.',
     loopBehavior: {
       shouldLoop: true,
       maxLoops: 2,
@@ -209,7 +207,7 @@ export const QUALITY_AGENTS = {
     estimatedTime: 20,
     description: 'Performance refactoring and optimization',
   },
-} as const satisfies Record<string, AgentSpawnConfig>
+} as const satisfies Record<string, AgentSpawnConfig>;
 
 /**
  * General Purpose Agent for Custom Tasks
@@ -224,7 +222,7 @@ export const GENERAL_PURPOSE_AGENT = {
   },
   estimatedTime: 0,
   description: 'General purpose agent for custom tasks',
-} as const satisfies AgentSpawnConfig
+} as const satisfies AgentSpawnConfig;
 
 /**
  * All available agents
@@ -233,15 +231,13 @@ export const ALL_AGENTS = {
   ...PR_REVIEW_AGENTS,
   ...QUALITY_AGENTS,
   GENERAL_PURPOSE: GENERAL_PURPOSE_AGENT,
-} as const
+} as const;
 
 /**
  * Get agent config by ID
  */
-export function getAgentConfig(
-  agentId: keyof typeof ALL_AGENTS
-): AgentSpawnConfig {
-  return ALL_AGENTS[agentId]
+export function getAgentConfig(agentId: keyof typeof ALL_AGENTS): AgentSpawnConfig {
+  return ALL_AGENTS[agentId];
 }
 
 /** Core agents for 95% ship-ready standard */
@@ -249,7 +245,7 @@ const SHIP_READY_AGENTS: AgentSpawnConfig[] = [
   PR_REVIEW_AGENTS.CODE_REVIEWER,
   PR_REVIEW_AGENTS.SILENT_FAILURE_HUNTER,
   PR_REVIEW_AGENTS.TYPE_DESIGN_ANALYZER,
-]
+];
 
 /** Additional agents for 98% production-perfect standard */
 const PRODUCTION_PERFECT_AGENTS: AgentSpawnConfig[] = [
@@ -260,24 +256,24 @@ const PRODUCTION_PERFECT_AGENTS: AgentSpawnConfig[] = [
   QUALITY_AGENTS.PERFORMANCE_ENGINEER,
   QUALITY_AGENTS.ARCHITECT_REVIEWER,
   QUALITY_AGENTS.REFACTORING_SPECIALIST,
-]
+];
 
 /**
  * Get agents for a specific quality level
  */
 export function getAgentsForQualityLevel(level: 95 | 98): AgentSpawnConfig[] {
-  return level === 95 ? SHIP_READY_AGENTS : PRODUCTION_PERFECT_AGENTS
+  return level === 95 ? SHIP_READY_AGENTS : PRODUCTION_PERFECT_AGENTS;
 }
 
 /**
  * Agent spawn result
  */
 export interface AgentSpawnResult {
-  agentId: string
-  taskId?: string
-  success: boolean
-  error?: string
-  loopCount: number
-  duration: number
-  output?: unknown
+  agentId: string;
+  taskId?: string;
+  success: boolean;
+  error?: string;
+  loopCount: number;
+  duration: number;
+  output?: unknown;
 }

@@ -13,61 +13,61 @@
  *   }
  */
 
-import { NextResponse } from 'next/server'
-import { ZodError } from 'zod'
+import { NextResponse } from 'next/server';
+import { ZodError } from 'zod';
 
 /**
  * Standard API error response format
  */
 export interface APIError {
-  error: string
-  message: string
-  statusCode: number
-  timestamp: string
+  error: string;
+  message: string;
+  statusCode: number;
+  timestamp: string;
 }
 
 type ErrorWithMeta = Error & {
-  status?: number
-  headers?: Record<string, string>
-}
+  status?: number;
+  headers?: Record<string, string>;
+};
 
 /**
  * Handles errors and returns formatted NextResponse
  */
 export function handleAPIError(error: unknown): NextResponse<APIError> {
-  const timestamp = new Date().toISOString()
-  let status = 500
-  const headers = new Headers()
+  const timestamp = new Date().toISOString();
+  let status = 500;
+  const headers = new Headers();
 
   // Zod validation errors
   if (error instanceof ZodError) {
     return NextResponse.json(
       {
         error: 'Validation Error',
-        message: error.issues.map(issue => issue.message).join(', '),
+        message: error.issues.map((issue) => issue.message).join(', '),
         statusCode: 400,
         timestamp,
       },
-      { status: 400, headers }
-    )
+      { status: 400, headers },
+    );
   }
 
   // Standard Error objects
   if (error instanceof Error) {
-    const meta = error as ErrorWithMeta
+    const meta = error as ErrorWithMeta;
     if (typeof meta.status === 'number') {
-      status = meta.status
+      status = meta.status;
     }
 
     if (meta.headers && typeof meta.headers === 'object') {
       Object.entries(meta.headers).forEach(([key, value]) => {
-        if (typeof value === 'string') headers.set(key, value)
-      })
+        if (typeof value === 'string') headers.set(key, value);
+      });
     }
 
     // Rate limit errors
     if (error.message.toLowerCase().includes('rate limit')) {
-      const statusCode = status === 500 ? 429 : status
+      const statusCode = status === 500 ? 429 : status;
       return NextResponse.json(
         {
           error: 'Rate Limit Exceeded',
@@ -75,16 +75,12 @@ export function handleAPIError(error: unknown): NextResponse<APIError> {
           statusCode,
           timestamp,
         },
-        { status: statusCode, headers }
-      )
+        { status: statusCode, headers },
+      );
     }
 
     const errorLabel =
-      status >= 500
-        ? 'Internal Server Error'
-        : status >= 400
-          ? 'Client Error'
-          : 'Error'
+      status >= 500 ? 'Internal Server Error' : status >= 400 ? 'Client Error' : 'Error';
 
     return NextResponse.json(
       {
@@ -93,8 +89,8 @@ export function handleAPIError(error: unknown): NextResponse<APIError> {
         statusCode: status,
         timestamp,
       },
-      { status, headers }
-    )
+      { status, headers },
+    );
   }
 
   // Unknown error type
@@ -105,25 +101,22 @@ export function handleAPIError(error: unknown): NextResponse<APIError> {
       statusCode: 500,
       timestamp,
     },
-    { status: 500, headers }
-  )
+    { status: 500, headers },
+  );
 }
 
 /**
  * Creates a success response with data
  */
-export function createSuccessResponse<T>(
-  data: T,
-  status: number = 200
-): NextResponse<T> {
-  return NextResponse.json(data, { status })
+export function createSuccessResponse<T>(data: T, status: number = 200): NextResponse<T> {
+  return NextResponse.json(data, { status });
 }
 
 /**
  * Creates an error with status code for handleAPIError
  */
 export function createAPIError(message: string, status: number = 500): Error {
-  const error = new Error(message) as ErrorWithMeta
-  error.status = status
-  return error
+  const error = new Error(message) as ErrorWithMeta;
+  error.status = status;
+  return error;
 }

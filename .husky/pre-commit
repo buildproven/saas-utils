@@ -1,0 +1,7 @@
+npx lint-staged
+
+# Defensive pattern analysis on staged files
+if [ -f "./scripts/pattern-check.sh" ]; then
+  echo "Running defensive pattern analysis..."
+  ./scripts/pattern-check.sh
+fi

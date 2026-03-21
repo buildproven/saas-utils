@@ -21,8 +21,8 @@
  * ```
  */
 
-import { vi, expect } from 'vitest'
-import type Stripe from 'stripe'
+import { vi, expect } from 'vitest';
+import type Stripe from 'stripe';
 
 // ============================================
 // Test Data
@@ -33,7 +33,7 @@ export const TEST_CARDS = {
   decline: '4000000000000002',
   insufficientFunds: '4000000000009995',
   requires3DS: '4000002760003184',
-} as const
+} as const;
 
 export const TEST_CUSTOMERS = {
   basic: {
@@ -51,7 +51,7 @@ export const TEST_CUSTOMERS = {
     email: 'enterprise@company.com',
     name: 'Enterprise User',
   },
-} as const
+} as const;
 
 export const TEST_PRICES = {
   qaProMonthly: 'price_qa_pro_monthly_test',
@@ -59,7 +59,7 @@ export const TEST_PRICES = {
   starterKitSingle: 'price_starter_single_test',
   starterKitUnlimited: 'price_starter_unlimited_test',
   validation: 'price_validation_test',
-} as const
+} as const;
 
 // ============================================
 // Mock Factories
@@ -68,9 +68,7 @@ export const TEST_PRICES = {
 /**
  * Create a mock Stripe client for unit tests
  */
-export function createStripeMock(
-  overrides: Partial<StripeMock> = {}
-): StripeMock {
+export function createStripeMock(overrides: Partial<StripeMock> = {}): StripeMock {
   const mockSubscription = {
     id: 'sub_test',
     status: 'active',
@@ -79,7 +77,7 @@ export function createStripeMock(
     items: {
       data: [{ id: 'si_test', price: { id: 'price_test' } }],
     },
-  }
+  };
 
   return {
     checkout: {
@@ -99,8 +97,8 @@ export function createStripeMock(
       },
     },
     webhooks: {
-      constructEvent: vi.fn().mockImplementation(payload => {
-        return JSON.parse(payload)
+      constructEvent: vi.fn().mockImplementation((payload) => {
+        return JSON.parse(payload);
       }),
     },
     customers: {
@@ -111,9 +109,7 @@ export function createStripeMock(
       create: vi.fn().mockResolvedValue(mockSubscription),
       retrieve: vi.fn().mockResolvedValue(mockSubscription),
       update: vi.fn().mockResolvedValue(mockSubscription),
-      cancel: vi
-        .fn()
-        .mockResolvedValue({ ...mockSubscription, status: 'canceled' }),
+      cancel: vi.fn().mockResolvedValue({ ...mockSubscription, status: 'canceled' }),
     },
     billingPortal: {
       sessions: {
@@ -124,34 +120,34 @@ export function createStripeMock(
       },
     },
     ...overrides,
-  }
+  };
 }
 
 export interface StripeMock {
   checkout: {
     sessions: {
-      create: ReturnType<typeof vi.fn>
-      retrieve: ReturnType<typeof vi.fn>
-    }
-  }
+      create: ReturnType<typeof vi.fn>;
+      retrieve: ReturnType<typeof vi.fn>;
+    };
+  };
   webhooks: {
-    constructEvent: ReturnType<typeof vi.fn>
-  }
+    constructEvent: ReturnType<typeof vi.fn>;
+  };
   customers: {
-    create: ReturnType<typeof vi.fn>
-    retrieve: ReturnType<typeof vi.fn>
-  }
+    create: ReturnType<typeof vi.fn>;
+    retrieve: ReturnType<typeof vi.fn>;
+  };
   subscriptions: {
-    create: ReturnType<typeof vi.fn>
-    retrieve: ReturnType<typeof vi.fn>
-    update: ReturnType<typeof vi.fn>
-    cancel: ReturnType<typeof vi.fn>
-  }
+    create: ReturnType<typeof vi.fn>;
+    retrieve: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    cancel: ReturnType<typeof vi.fn>;
+  };
   billingPortal: {
     sessions: {
-      create: ReturnType<typeof vi.fn>
-    }
-  }
+      create: ReturnType<typeof vi.fn>;
+    };
+  };
 }
 
 // ============================================
@@ -159,13 +155,13 @@ export interface StripeMock {
 // ============================================
 
 export interface EventFactoryOptions {
-  userId?: string
-  customerId?: string
-  subscriptionId?: string
-  priceId?: string
-  status?: Stripe.Subscription.Status
-  email?: string
-  metadata?: Record<string, string>
+  userId?: string;
+  customerId?: string;
+  subscriptionId?: string;
+  priceId?: string;
+  status?: Stripe.Subscription.Status;
+  email?: string;
+  metadata?: Record<string, string>;
 }
 
 const defaultEventOptions: EventFactoryOptions = {
@@ -175,7 +171,7 @@ const defaultEventOptions: EventFactoryOptions = {
   priceId: 'price_test',
   status: 'active',
   email: 'test@example.com',
-}
+};
 
 /**
  * Helper to create base event structure
@@ -191,15 +187,13 @@ function createBaseEvent<T extends string>(type: T, eventId?: string) {
     request: null,
     api_version: '2024-12-18.acacia' as const,
     object: 'event' as const,
-  }
+  };
 }
 
 /**
  * Helper to create a mock subscription object
  */
-function createMockSubscriptionObject(
-  options: EventFactoryOptions
-): Stripe.Subscription {
+function createMockSubscriptionObject(options: EventFactoryOptions): Stripe.Subscription {
   return {
     id: options.subscriptionId || 'sub_test_123',
     customer: options.customerId || 'cus_test_123',
@@ -221,7 +215,7 @@ function createMockSubscriptionObject(
       userId: options.userId || 'user-123',
       ...(options.metadata || {}),
     },
-  } as unknown as Stripe.Subscription
+  } as unknown as Stripe.Subscription;
 }
 
 /**
@@ -229,22 +223,21 @@ function createMockSubscriptionObject(
  */
 export function createCheckoutEvent(
   options: EventFactoryOptions & {
-    product?: string
-    amount?: number
-    currency?: string
-    sessionId?: string
-    mode?: 'payment' | 'subscription'
-  } = {}
+    product?: string;
+    amount?: number;
+    currency?: string;
+    sessionId?: string;
+    mode?: 'payment' | 'subscription';
+  } = {},
 ): Stripe.Event {
-  const opts = { ...defaultEventOptions, ...options }
+  const opts = { ...defaultEventOptions, ...options };
 
   return {
     ...createBaseEvent('checkout.session.completed'),
     data: {
       object: {
         id: options.sessionId || 'cs_test_123',
-        mode:
-          options.mode || (opts.subscriptionId ? 'subscription' : 'payment'),
+        mode: options.mode || (opts.subscriptionId ? 'subscription' : 'payment'),
         customer: opts.customerId,
         subscription: opts.subscriptionId,
         customer_details: {
@@ -263,22 +256,20 @@ export function createCheckoutEvent(
         },
       },
     },
-  } as unknown as Stripe.Event
+  } as unknown as Stripe.Event;
 }
 
 /**
  * Create a customer.subscription.created event
  */
-export function createSubscriptionCreatedEvent(
-  options: EventFactoryOptions = {}
-): Stripe.Event {
-  const opts = { ...defaultEventOptions, ...options }
+export function createSubscriptionCreatedEvent(options: EventFactoryOptions = {}): Stripe.Event {
+  const opts = { ...defaultEventOptions, ...options };
   return {
     ...createBaseEvent('customer.subscription.created'),
     data: {
       object: createMockSubscriptionObject(opts),
     },
-  } as unknown as Stripe.Event
+  } as unknown as Stripe.Event;
 }
 
 /**
@@ -286,36 +277,34 @@ export function createSubscriptionCreatedEvent(
  */
 export function createSubscriptionUpdatedEvent(
   options: EventFactoryOptions & {
-    previousAttributes?: Record<string, unknown>
-  } = {}
+    previousAttributes?: Record<string, unknown>;
+  } = {},
 ): Stripe.Event {
-  const opts = { ...defaultEventOptions, ...options }
+  const opts = { ...defaultEventOptions, ...options };
   return {
     ...createBaseEvent('customer.subscription.updated'),
     data: {
       object: createMockSubscriptionObject(opts),
       previous_attributes: options.previousAttributes || {},
     },
-  } as unknown as Stripe.Event
+  } as unknown as Stripe.Event;
 }
 
 /**
  * Create a customer.subscription.deleted event
  */
-export function createSubscriptionDeletedEvent(
-  options: EventFactoryOptions = {}
-): Stripe.Event {
+export function createSubscriptionDeletedEvent(options: EventFactoryOptions = {}): Stripe.Event {
   const opts = {
     ...defaultEventOptions,
     ...options,
     status: 'canceled' as const,
-  }
+  };
   return {
     ...createBaseEvent('customer.subscription.deleted'),
     data: {
       object: createMockSubscriptionObject(opts),
     },
-  } as unknown as Stripe.Event
+  } as unknown as Stripe.Event;
 }
 
 /**
@@ -324,21 +313,21 @@ export function createSubscriptionDeletedEvent(
  */
 export function createSubscriptionEvent(
   type: 'customer.subscription.created' | 'customer.subscription.deleted',
-  options: EventFactoryOptions = {}
+  options: EventFactoryOptions = {},
 ): Stripe.Event {
   if (type === 'customer.subscription.deleted') {
-    return createSubscriptionDeletedEvent(options)
+    return createSubscriptionDeletedEvent(options);
   }
-  return createSubscriptionCreatedEvent(options)
+  return createSubscriptionCreatedEvent(options);
 }
 
 /**
  * Create an invoice.payment_succeeded event
  */
 export function createPaymentSucceededEvent(
-  options: EventFactoryOptions & { amount?: number } = {}
+  options: EventFactoryOptions & { amount?: number } = {},
 ): Stripe.Event {
-  const opts = { ...defaultEventOptions, ...options }
+  const opts = { ...defaultEventOptions, ...options };
   return {
     ...createBaseEvent('invoice.payment_succeeded'),
     data: {
@@ -351,16 +340,16 @@ export function createPaymentSucceededEvent(
         currency: 'usd',
       },
     },
-  } as unknown as Stripe.Event
+  } as unknown as Stripe.Event;
 }
 
 /**
  * Create an invoice.payment_failed event
  */
 export function createPaymentFailedEvent(
-  options: EventFactoryOptions & { attemptCount?: number } = {}
+  options: EventFactoryOptions & { attemptCount?: number } = {},
 ): Stripe.Event {
-  const opts = { ...defaultEventOptions, ...options }
+  const opts = { ...defaultEventOptions, ...options };
   return {
     ...createBaseEvent('invoice.payment_failed'),
     data: {
@@ -372,7 +361,7 @@ export function createPaymentFailedEvent(
         attempt_count: options.attemptCount || 1,
       },
     },
-  } as unknown as Stripe.Event
+  } as unknown as Stripe.Event;
 }
 
 /**
@@ -381,17 +370,17 @@ export function createPaymentFailedEvent(
  */
 export function createInvoiceEvent(
   options: {
-    invoiceId?: string
-    customerId?: string
-    subscriptionId?: string
-    amount?: number
-  } = {}
+    invoiceId?: string;
+    customerId?: string;
+    subscriptionId?: string;
+    amount?: number;
+  } = {},
 ): Stripe.Event {
   return createPaymentSucceededEvent({
     customerId: options.customerId,
     subscriptionId: options.subscriptionId,
     amount: options.amount,
-  })
+  });
 }
 
 // ============================================
@@ -413,7 +402,7 @@ export const STRIPE_STATUS_MAP: Record<
   trialing: 'trial',
   unpaid: 'past_due',
   paused: 'cancelled',
-}
+};
 
 // ============================================
 // Test Helpers
@@ -425,9 +414,9 @@ export const STRIPE_STATUS_MAP: Record<
  */
 export function generateTestSignature(
   payload: string,
-  timestamp = Math.floor(Date.now() / 1000)
+  timestamp = Math.floor(Date.now() / 1000),
 ): string {
-  return `t=${timestamp},v1=test_signature_${timestamp}`
+  return `t=${timestamp},v1=test_signature_${timestamp}`;
 }
 
 /**
@@ -435,18 +424,18 @@ export function generateTestSignature(
  */
 export function createWebhookRequest(
   event: Stripe.Event,
-  signature?: string
+  signature?: string,
 ): {
-  body: string
-  headers: { 'stripe-signature': string }
+  body: string;
+  headers: { 'stripe-signature': string };
 } {
-  const body = JSON.stringify(event)
+  const body = JSON.stringify(event);
   return {
     body,
     headers: {
       'stripe-signature': signature || generateTestSignature(body),
     },
-  }
+  };
 }
 
 /**
@@ -455,25 +444,25 @@ export function createWebhookRequest(
 export function assertCheckoutCreated(
   mock: ReturnType<typeof vi.fn>,
   expected: {
-    priceId?: string
-    mode?: 'payment' | 'subscription'
-    email?: string
-    metadata?: Record<string, string>
-  }
+    priceId?: string;
+    mode?: 'payment' | 'subscription';
+    email?: string;
+    metadata?: Record<string, string>;
+  },
 ): void {
-  expect(mock).toHaveBeenCalled()
-  const call = mock.mock.calls[0][0]
+  expect(mock).toHaveBeenCalled();
+  const call = mock.mock.calls[0][0];
 
   if (expected.priceId) {
-    expect(call.line_items[0].price).toBe(expected.priceId)
+    expect(call.line_items[0].price).toBe(expected.priceId);
   }
   if (expected.mode) {
-    expect(call.mode).toBe(expected.mode)
+    expect(call.mode).toBe(expected.mode);
   }
   if (expected.email) {
-    expect(call.customer_email).toBe(expected.email)
+    expect(call.customer_email).toBe(expected.email);
   }
   if (expected.metadata) {
-    expect(call.metadata).toMatchObject(expected.metadata)
+    expect(call.metadata).toMatchObject(expected.metadata);
   }
 }
